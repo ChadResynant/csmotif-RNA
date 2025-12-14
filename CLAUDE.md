@@ -57,3 +57,49 @@ sim.imino/
 - **Barcode:** Triplet motif identifier like "GC-UA-CG" (current base pair flanked by neighbors)
 - **Motif types:** `basePair`, `triplet` (3 consecutive base pairs), `penta` (5 consecutive)
 - The predictor only works for residues within continuous A-form helices (no bulges/loops)
+
+## Chemical Shift Reference Data
+
+The `tools/NH.cs` lookup table contains 145 triplet barcode entries with experimentally-derived chemical shifts:
+- **N range:** ~142-163 ppm (imino nitrogen)
+- **H range:** ~10-14.6 ppm (imino proton)
+- **Format:** `Barcode  N_shift  H_shift` (space-separated)
+
+**Imino nuclei by residue type:**
+| Residue | Nitrogen | Proton |
+|---------|----------|--------|
+| G | N1 | H1 |
+| U | N3 | H3 |
+
+## Known Issues
+
+### Import Path Problems in sim.imino/
+The `mkucsf.py` script has broken imports:
+```python
+from common.base import divide  # Should be: from tools.base import divide
+from sparky import *            # External dependency, not included
+```
+
+To run spectrum simulation, you need:
+1. External `sparky` module (for Sparky save file generation)
+2. External `mplot` module (for `genproj.py` plotting)
+3. PYTHONPATH set to include parent directory
+
+### Python 2 Only
+Do NOT convert to Python 3 without explicit request. Key Python 2 patterns:
+- `print 'text'` (no parentheses)
+- `map()` returns list directly
+- Backtick conversion: `` `resi` `` instead of `str(resi)`
+- `reduce()` is built-in (not from functools)
+
+## Testing
+
+No automated tests exist. Manual testing:
+```bash
+# Test prediction
+python genimino.py tP5abc.seq
+# Verify imino.tab has 24 lines (12 G/U residues × 2 nuclei each)
+
+# Test simulation (requires dependencies)
+cd sim.imino && ./clean.sh && python mkucsf.py
+```
