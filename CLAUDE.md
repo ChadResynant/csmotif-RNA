@@ -90,30 +90,57 @@ The `mkucsf_gpu.py` module provides GPU-accelerated 2D NMR spectrum simulation.
 | CuPy | NVIDIA GPU | `pip install cupy-cuda11x` |
 | NumPy | CPU (fallback) | `pip install numpy` |
 
-### Performance
+### Performance (Benchmarked)
 
 For 12 peaks on 512×1024 grid:
-- **NumPy CPU:** ~6 ms
-- **PyTorch MPS:** ~3 ms (2× speedup)
-- **CuPy CUDA:** ~1 ms (6× speedup, estimated)
+- **NumPy CPU:** ~1.5 ms (optimized with einsum)
+- **CuPy CUDA:** ~1.2 ms (RTX A2000)
 
-Speedup increases with:
-- More peaks (50+ peaks → 10× speedup)
-- Larger grids (1024×2048 → 5× speedup)
-- Batch processing multiple spectra
+For 500 peaks on 1024×2048 grid:
+- **NumPy CPU:** ~14 ms
+- **CuPy CUDA:** ~4 ms (3.3× speedup)
+
+GPU speedup increases with problem size. Use `--benchmark` to test your system.
+
+### Optimizations Applied
+
+- **einsum operations:** Fused batched outer products reduce memory bandwidth
+- **Coordinate caching:** Avoid repeated array allocations
+- **Pre-computed constants:** FWHM-to-sigma at module level
+- **TF32 enabled:** Faster matmul on Ampere+ GPUs
+- **torch.compile:** Optional JIT compilation for PyTorch 2.0+ (`--compiled`)
+- **float16 support:** Optional half precision (`--float16`)
+
+### Command Line Options
+
+```bash
+cd sim.imino
+python3 mkucsf_gpu.py --benchmark           # Run performance test
+python3 mkucsf_gpu.py --backend cupy        # Force CuPy backend
+python3 mkucsf_gpu.py --compiled            # Use torch.compile JIT
+python3 mkucsf_gpu.py --float16             # Half precision (saves memory)
+```
 
 ### API Usage
 
 ```python
 from sim.imino.mkucsf_gpu import init_gpu_backend, sim_2d_gaussian_gpu_batched
 
-init_gpu_backend('torch')  # or 'cupy', 'numpy'
+init_gpu_backend('cupy')  # or 'torch', 'numpy'
 
+# Standard usage
 spectrum = sim_2d_gaussian_gpu_batched(
     shape=(512, 1024),
     peaks=[(256, 512), (300, 600)],      # (row, col) in points
     linewidths=[(6.0, 12.0), (6.0, 12.0)],  # FWHM in points
     amplitudes=[100.0, 100.0]
+)
+
+# Memory-efficient with float16
+spectrum = sim_2d_gaussian_gpu_batched(
+    shape=(512, 1024),
+    peaks=peaks, linewidths=lws, amplitudes=amps,
+    use_float16=True  # 2x memory savings
 )
 ```
 
@@ -134,6 +161,25 @@ The `tools/NH.cs` lookup table contains 145 triplet barcode entries:
 - **Barcode:** Triplet motif identifier like "GC-UA-CG" (current base pair flanked by neighbors)
 - **Motif types:** `basePair`, `triplet` (3 consecutive base pairs), `penta` (5 consecutive)
 - The predictor only works for residues within continuous A-form helices (no bulges/loops)
+
+## Algorithm Flow
+
+1. **Parse input:** Read sequence and bracket-dot structure from `.seq` file
+2. **Build pairing map:** `pairing()` uses a stack to map each `(` to its matching `)` position
+3. **For each G/U residue:** Call `getMotif('triplet', idx, seq, bdstr)`
+   - Verify residue is base-paired (has partner in bracket-dot)
+   - Check neighbors form continuous A-form helix (bp_cur, bp_pre, bp_nxt are stacked)
+   - Return base pair identities: `[current_bp, prev_bp, next_bp]`
+4. **Build barcode:** Join base pairs with `-` → e.g., "GC-UA-CG"
+5. **Lookup shifts:** Query `NH.cs` table by barcode → returns (N_ppm, H_ppm)
+6. **Output:** Write two lines per residue (N atom and H atom)
+
+**Output format (`imino.tab`):**
+```
+ResName  ResNum  Atom    Shift
+G            2     N1   148.94
+G            2     H1    13.48
+```
 
 ## Dependencies
 
