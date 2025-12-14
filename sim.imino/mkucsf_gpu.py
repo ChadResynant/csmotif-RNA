@@ -448,17 +448,17 @@ def main():
 
     shape = (512, 1024)
 
-    # Create unit conversion functions (simplified version of nmrglue's)
+    # Create unit conversion functions (UCSF convention: point 0 = highest frequency)
     def ppm_to_pts_N(ppm):
         """Convert 15N ppm to points."""
         hz = ppm * 60.8
-        frac = (hz - carN + swN/2) / swN
+        frac = (carN + swN/2 - hz) / swN  # car + sw/2 - hz for descending freq
         return frac * shape[0]
 
     def ppm_to_pts_H(ppm):
         """Convert 1H ppm to points."""
         hz = ppm * 600.0
-        frac = (hz - carH + swH/2) / swH
+        frac = (carH + swH/2 - hz) / swH  # car + sw/2 - hz for descending freq
         return frac * shape[1]
 
     # Convert peaks to point coordinates
