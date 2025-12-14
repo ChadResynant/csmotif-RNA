@@ -1,5 +1,6 @@
 import os
 import operator
+from functools import reduce
 
 #===============================================================================
 class AnsiColor:
@@ -113,15 +114,15 @@ def findcommon(a, b):
 
 #===============================================================================
 def range2list(mystr):
-    fds = [map(int, fd.split('-')) for fd in mystr.split(',')]
-    mylist = reduce(operator.add, [range(fd[0], fd[-1]+1) for fd in fds])
+    fds = [list(map(int, fd.split('-'))) for fd in mystr.split(',')]
+    mylist = reduce(operator.add, [list(range(fd[0], fd[-1]+1)) for fd in fds])
     return mylist
 
 #===============================================================================
 def alignstr(strs):
     str0 = strs[0]
-    print('%s'%str0)
+    print('%s' % str0)
     for str1 in strs[1:]:
         cs = [(c1 if c1!=c0 else '-') for c0,c1 in zip(str0, str1)]
         cs = ''.join(cs)
-        print('%s'%cs)
+        print('%s' % cs)

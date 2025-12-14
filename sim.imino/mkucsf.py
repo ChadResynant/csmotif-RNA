@@ -1,38 +1,45 @@
-#! /usr/bin/python
+#!/usr/bin/env python3
 
 import nmrglue as ng
 import numpy as np
 from os import path
-from common.base import divide
-from sparky import *
+import sys
+sys.path.insert(0, '..')
+from tools.base import divide
 
-NU = [('H1','N1'), ('H3','N3')]
+# Optional Sparky save file support
+try:
+    from sparky import SVFile, Node
+    HAS_SPARKY = True
+except ImportError:
+    HAS_SPARKY = False
+
+NU = [('H1', 'N1'), ('H3', 'N3')]
 
 # read in the CS data
 lines = open('../imino.tab').readlines()
-lines = filter(lambda x: x[:1]!='#', lines)
+lines = [x for x in lines if x[:1] != '#']
 # build lookup table
 data = {}
 blks = divide(lines, lambda x: x.split()[1])
 for blk in blks:
     fds = blk[0].split()
-    resn,resi = fds[0],int(fds[1])
+    resn, resi = fds[0], int(fds[1])
     CS = {}
     for line in blk:
         fds = line.split()
-        resn,resi,nu,cs = fds[0],int(fds[1]),fds[2],float(fds[3])
+        resn, resi, nu, cs = fds[0], int(fds[1]), fds[2], float(fds[3])
         CS[nu] = cs
     data[resi] = [resn, CS]
 # find peaks
 pks = []
-resis = data.keys()
-resis.sort()
+resis = sorted(data.keys())
 for resi in resis:
-    resn,CS = data[resi]
-    for nu1,nu2 in NU:
+    resn, CS = data[resi]
+    for nu1, nu2 in NU:
         if nu1 in CS and nu2 in CS:
-            pks.append([resn+`resi`,CS[nu1],CS[nu2]])
-print 'simulated %d imino peaks: '%len(pks) + ' '.join(map(lambda x: x[0], pks))
+            pks.append([resn + str(resi), CS[nu1], CS[nu2]])
+print('simulated %d imino peaks: ' % len(pks) + ' '.join([x[0] for x in pks]))
 
 npeaks = len(pks)
 csH = np.array([item[1] for item in pks])
@@ -104,10 +111,10 @@ data = ng.linesh.sim_NDregion(shape, lineshapes, params, amps)
 ng.sparky.write("sim.ucsf", dic, data.astype('float32'), overwrite=True)
 
 # generate a save file if possible
-if path.isfile('tpl.save'):
+if HAS_SPARKY and path.isfile('tpl.save'):
     sv = SVFile('tpl.save')
     i = 1
-    for ass,csx,csy in pks:
+    for ass, csx, csy in pks:
         pk = Node()
         pk.id = i
         pk.label = ass
@@ -119,3 +126,5 @@ if path.isfile('tpl.save'):
         sv.pks.append(pk)
         i += 1
     sv.write('sim.save')
+elif path.isfile('tpl.save'):
+    print('Note: sparky module not available, skipping .save file generation')
