@@ -127,3 +127,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# macOS
+.DS_Store
+
+# Generated spectrum files
+sim.imino/sim_gpu.ucsf
+sim.imino/sim_gpu.npy
+*_sim.ucsf
+*_imino.tab
+*_imino.json
