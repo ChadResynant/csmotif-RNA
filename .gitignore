@@ -132,8 +132,11 @@ dmypy.json
 .DS_Store
 
 # Generated spectrum files
+sim.imino/sim.ucsf
 sim.imino/sim_gpu.ucsf
 sim.imino/sim_gpu.npy
+sim.imino/sim.save
+sim.imino/sim_gpu.save
 *_sim.ucsf
 *_imino.tab
 *_imino.json

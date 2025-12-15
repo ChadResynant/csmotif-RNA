@@ -1,0 +1,28 @@
+[project]
+name = "csmotif-rna"
+version = "1.0.0"
+description = "RNA imino chemical shift predictor using motif-based lookup tables"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+dependencies = [
+    "numpy",
+]
+
+[project.optional-dependencies]
+simulation = [
+    "nmrglue",
+]
+gpu = [
+    "torch",
+]
+dev = [
+    "pytest",
+    "nmrglue",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
