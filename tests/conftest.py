@@ -29,9 +29,8 @@ def tp5abc_sequence():
 
 @pytest.fixture
 def tp5abc_structure():
-    """Full tP5abc structure from test file."""
-    return "(((((((((..(((((....))))).(((((....)))))..))).....)))))))".rstrip(")")
-    # Note: actual structure has matching parens
+    """Full tP5abc structure from tP5abc.seq (19 open, 19 close)."""
+    return "(((((((((..(((((....))))).(((((....)))))..))).....))))))"
 
 
 @pytest.fixture

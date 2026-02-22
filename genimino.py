@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
-from glob import glob
 from sys import argv
 from tools.base import range2list
-from tools.bctab import *
-from tools.fraMotif import *
+from tools.bctab import BCTab
+from tools.fraMotif import getMotif
 
 '''This tool is used to predict the chemical shifts of  RNA imino group within A-form helix. Only support base pairs [GC,CG,UA,AU,GU,UG] for now.'''
 
