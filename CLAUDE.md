@@ -256,8 +256,21 @@ For cross-platform helpers (file hashing, memory size, ping) that do NOT involve
 - Use `np.` prefix for NumPy functions (not `from numpy import *`)
 - Imports use absolute paths from repo root (`from tools.base import ...`)
 - GPU code uses graceful fallbacks to CPU
+- `genimino_batch.py` (`predict_chemical_shifts()`) is the clean API; `genimino.py` is a legacy script
+
+### Critical Gotchas
+
+**`getMotif()` returns `(False, False)` on failure** — not `(None, None)`. Always check `if mode:` not `if mode is not None:`. Callers that check `idx` are checking the wrong variable (mode carries the base-pair identity; idx carries atom indices).
+
+**`genimino.py` requires CWD = repo root** — it hardcodes `'./tools/NH.cs'`. Run it as `python3 genimino.py tP5abc.seq` from the repo root. `genimino_batch.py` uses `os.path.dirname(__file__)` and works from any directory.
+
+**`BCTab` auto-detects nucleus type from value ranges** — `readTab()` inspects column 2 values to decide whether to populate `NH`, `CH`, or sugar `CH` dicts. When adding a new `.cs` file, the column 2 values must fall within one of the hardcoded ranges or the table will silently stay empty. Verify with `assert len(tab.NH) > 0` (or the relevant dict).
+
+**`pairing()` is called inside every `getMotif()` call** — it recomputes the full bracket-dot parsing each time. For large batches, pre-compute `pairing(bdstr)` once and pass it directly if performance matters.
+
+**PPM-to-points conversion** — the three-step process (PPM→Hz→fraction→points) is required for correct UCSF placement. Direct PPM×freq gives wrong positions. See `docs/lessons/FAILED_APPROACHES.md` and `genimino_batch.py:ppm_to_pts_N()` for the canonical implementation.
 
 ### Adding New Features
-- Chemical shift tables: Add new `.cs` files to `tools/`, update BCTab if needed
+- Chemical shift tables: Add new `.cs` files to `tools/`, update BCTab if needed; verify the values fall in BCTab's auto-detected ranges
 - New motif types: Extend `getMotif()` in `tools/fraMotif.py`
 - Spectrum parameters: Modify udic in simulation scripts
