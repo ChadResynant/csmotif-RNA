@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 CSmotif-RNA is an RNA chemical shift predictor based on motifs. It predicts NMR chemical shifts (N and H) for imino groups in RNA A-form helices using motif-based lookup tables.
 
-**Python Version:** Python 3.6+ (converted from Python 2 on 2025-12-14)
+**Python Version:** Python 3.9+ (converted from Python 2 on 2025-12-14; `pyproject.toml` enforces `>=3.9`)
 
 ## Usage
 
@@ -65,11 +65,15 @@ python3 mkucsf_gpu.py --backend cupy    # Force CuPy (NVIDIA)
 ```
 genimino.py              # Main prediction script
 genimino_batch.py        # Batch processing with GPU support
+shell_exec.py            # ONLY entry point for external process execution (frozen API)
+platform_utils.py        # Cross-platform helpers (md5, memory, ping) — no shell
 tools/
   fraMotif.py            # Motif extraction (triplet, penta, basePair)
   bctab.py               # BCTab class - chemical shift lookup table parser
   NH.cs                  # Reference chemical shifts indexed by "barcode"
   base.py                # Utilities (range2list, text partitioning, colors)
+  ci/
+    shell_hygiene_gate_hardmode.sh  # CI gate: zero-tolerance shell hazard check
 sim.imino/
   mkucsf.py              # Spectrum simulation using nmrglue
   mkucsf_gpu.py          # GPU-accelerated spectrum simulation
@@ -193,24 +197,58 @@ G            2     H1    13.48
 - `torch` - PyTorch GPU acceleration
 - `cupy` - CuPy GPU acceleration (NVIDIA only)
 
-Install all:
+Install via pyproject.toml extras:
 ```bash
-pip install numpy nmrglue matplotlib torch
+pip install -e ".[dev]"          # Core + pytest + nmrglue (recommended for development)
+pip install -e ".[simulation]"   # Core + nmrglue
+pip install -e ".[gpu]"          # Core + torch
 ```
 
 ## Testing
 
 ```bash
-# Test basic prediction
-python3 genimino.py tP5abc.seq
-# Verify: imino.tab has 24 lines (12 G/U residues × 2 nuclei each)
+# Run full test suite (from repo root)
+pytest
 
-# Test batch processing
-python3 genimino_batch.py tP5abc.seq --simulate --gpu
+# Run a single test file
+pytest tests/test_motif.py
+
+# Run a single test by name
+pytest -k "test_barcode_lookup"
+
+# Smoke test: basic prediction (verify imino.tab has 24 lines = 12 residues × 2 nuclei)
+python3 genimino.py tP5abc.seq
 
 # Test GPU simulation benchmark
 cd sim.imino && python3 mkucsf_gpu.py --benchmark
 ```
+
+## Shell Hardening (CI-Enforced)
+
+This repo enforces zero-tolerance shell hazard rules. CI blocks any new use of `os.system()`, `shell=True`, or `os.popen()`.
+
+**Before pushing, run:**
+```bash
+./tools/ci/shell_hygiene_gate_hardmode.sh
+```
+
+**All external process calls must go through `shell_exec.py`:**
+```python
+from shell_exec import run_argv, run_bash, sh_quote, ExecKind
+
+# Preferred: direct argv (no shell injection risk)
+run_argv(["python3", script_path])
+
+# Shell features only (pipes, redirects): use run_bash with sh_quote for untrusted values
+run_bash(f"cat {sh_quote(path)} | wc -l")
+```
+
+**Never use:**
+- `subprocess.run(..., shell=True)`
+- `os.system(...)`
+- `os.popen(...)`
+
+For cross-platform helpers (file hashing, memory size, ping) that do NOT involve user-controlled data, use `platform_utils.py`.
 
 ## Development Notes
 
