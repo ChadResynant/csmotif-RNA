@@ -104,11 +104,11 @@ def init_gpu_backend(preferred=None):
 
 def _get_coords_torch(rows, cols, device, dtype=None):
     """Get cached coordinate arrays for PyTorch."""
+    import torch
     if dtype is None:
         dtype = torch.float32
     key = (rows, cols, str(device), dtype)
     if key not in _coord_cache:
-        import torch
         _coord_cache[key] = (
             torch.arange(rows, dtype=dtype, device=device),
             torch.arange(cols, dtype=dtype, device=device)
