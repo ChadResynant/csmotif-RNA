@@ -2,6 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Governance Prerequisite (Non-Negotiable)
+
+**Before any work in this repository, read and comply with:** [`~/repos/governance/INDEX.md`](../governance/INDEX.md)
+
+All cross-repo contracts, policies, and enforcement gates in `~/repos/governance/` are binding. Repo-specific rules below may extend but never override governance contracts.
+
+
 ## Overview
 
 CSmotif-RNA is an RNA chemical shift predictor based on motifs. It predicts NMR chemical shifts (N and H) for imino groups in RNA A-form helices using motif-based lookup tables.
