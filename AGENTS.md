@@ -12,6 +12,17 @@ This file is intentionally minimal. **You MUST also read `CLAUDE.md` in this rep
 
 If both files exist, follow both. CLAUDE.md has the detailed guidance; this file ensures Codex agents discover it.
 
+## Skills (shared index)
+
+CHAD Suite skills live in `~/repos/claude-config/skills/<name>/SKILL.md`. A
+machine-readable index of every skill (name, description, path) is at:
+
+- `~/repos/claude-config/skills/SKILLS_INDEX.json` — load to discover available skills
+- `~/repos/claude-config/skills/SKILLS_INDEX.md` — human-readable table
+
+To use a skill, read its `SKILL.md` and follow it. Regenerate after changing
+skills: `python3 ~/repos/claude-config/scripts/gen_skills_index.py`.
+
 ## Agent Rules
 
 - Complete PHASE 0 instruction audit before any code changes
