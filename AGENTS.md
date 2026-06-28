@@ -1,6 +1,22 @@
 # AGENTS.md
 
 
+<!-- AGENTS-CODEX-PREFLIGHT-v1 -->
+## For Codex / non-Claude agents — read this repo's CLAUDE.md, then prove context
+
+If you are Codex (or any agent that does not auto-load `CLAUDE.md`):
+- **Read `./CLAUDE.md` in THIS directory, in full, before any work.** It carries this repo's
+  binding invariants, the contracts that apply, gotchas, and build/test commands. This
+  `AGENTS.md` is only a pointer (summary + links) — the repo-specific rules live in `./CLAUDE.md`
+  and in `~/repos/governance/`.
+- **Run the mandatory PHASE 0.25 context proof when you start a task in a new repo:**
+  `python3 ~/repos/governance/enforcement/generate_challenge.py`, emit a `CONTEXT_PROOF`
+  (format: `~/repos/governance/enforcement/test_fixtures/complete_proof.yaml`), then
+  `python3 ~/repos/governance/enforcement/verify_agent_context.py --proof <file>` — proceed
+  only on exit 0. Authoritative: `governance/protocols/MANDATORY_CONTEXT_VERIFICATION_PROTOCOL.md`.
+- Treat `~/repos/governance/INDEX.md` and its contracts/policies as binding.
+<!-- /AGENTS-CODEX-PREFLIGHT-v1 -->
+
 <!-- GOVERNANCE-PREFLIGHT-v1 -->
 ## Governance Pre-Flight (summary — binding rules live in governance/)
 
@@ -14,7 +30,6 @@ This is a summary; the binding rules and full checklists live in governance (sou
 - `~/repos/governance/standards/DOCUMENT_TEMPLATE_REGISTRY.md` — which template to use
 - `~/repos/governance/INDEX.md` — master registry of all contracts, policies, gates
 <!-- /GOVERNANCE-PREFLIGHT-v1 -->
-
 
 ## Governance Prerequisite (Non-Negotiable)
 
