@@ -27,27 +27,19 @@ If you are Codex (or any agent that does not auto-load `CLAUDE.md`):
 <!-- GOVERNANCE-PREFLIGHT-v1 -->
 ## Governance Pre-Flight (summary — binding rules live in governance/)
 
-Interactive Codex sessions use lightweight startup by default: no workspace audit or PHASE 0.5
-restatement before the task is known. `codex --full-context` restores both. Other launchers retain
-their configured startup behavior.
-
-After task scope is known:
-- Load only the relevant repo instructions and governance contracts.
+All agents — Claude, Codex, Grok, Gemini, Hermes — before starting a task:
+- Complete the startup audit and the **PHASE 0.5 pre-flight restatement**: restate to the
+  user a 3–5 step plan plus the three most relevant governance policies, before doing the work.
 - Use the **canonical document template** for any document — do not invent a format.
 
-**AGENTS NEVER SEND (absolute order).** No email, calendar invitation, meeting update or
-cancellation, or message of any kind — to a customer or to **anyone else**. **A calendar invite
-with an attendee IS a message**, as is a time change, a cancellation, and any tool call with a
-`notify`/`notificationLevel`/`sendUpdates` parameter. *"Set up a call with X"* authorizes
-preparing the call, **not** contacting X. Produce drafts; **Chelsea Collado handles customer
-communications**, Chad transmits or delegates the rest.
-
 This is a summary; the binding rules and full checklists live in governance (source of truth):
-- `~/repos/governance/policies/AGENT_INTERACTION_POLICY.md` — startup sequence + PHASE 0.5,
-  and §"External Communication and Representation — Agents Do Not Transmit"
+- `~/repos/governance/policies/AGENT_INTERACTION_POLICY.md` — startup sequence + PHASE 0.5
 - `~/repos/governance/standards/DOCUMENT_TEMPLATE_REGISTRY.md` — which template to use
 - `~/repos/governance/INDEX.md` — master registry of all contracts, policies, gates
 <!-- /GOVERNANCE-PREFLIGHT-v1 -->
+
+
+
 
 ## Governance Prerequisite (Non-Negotiable)
 
@@ -74,6 +66,7 @@ skills: `python3 ~/repos/claude-config/scripts/gen_skills_index.py`.
 
 ## Agent Rules
 
+- Default to caveman mode for interactive responses (terse, concise per caveman skill) unless user requests "normal mode" or active context requires Auto-Clarity Exceptions (governance pre-flights, safety warnings, inter-agent messages, commit messages).
 - Complete PHASE 0 instruction audit before any code changes
 - Read `~/repos/governance/policies/AGENT_INTERACTION_POLICY.md` for full agent protocol
 - 3 failed attempts at same fix → STOP and escalate
