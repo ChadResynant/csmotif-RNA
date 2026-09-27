@@ -140,3 +140,6 @@ sim.imino/sim_gpu.save
 *_sim.ucsf
 *_imino.tab
 *_imino.json
+
+# Graft map cache — generated and published by Chad; contributors fetch a validated map.
+/graft/
