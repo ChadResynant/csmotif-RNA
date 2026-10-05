@@ -5,8 +5,9 @@
 ## Governance Pre-Flight (summary — binding rules live in governance/)
 
 All agents — Claude, Codex, Grok, Gemini, Hermes — before starting a task:
-- Complete the startup audit and the **PHASE 0.5 pre-flight restatement**: restate to the
-  user a 3–5 step plan plus the three most relevant governance policies, before doing the work.
+- Follow the task-scoped startup and pre-flight requirements in the linked Agent Interaction
+  Policy. Scale the plan and cited policies to the task; do not force a fixed number of steps or
+  policies. Lightweight Codex work does not imply a full-context audit.
 - Use the **canonical document template** for any document — do not invent a format.
 - Before reporting completion, run
   `~/repos/repos-config/scripts/branch_worktree_lifecycle_gate.py --root ~/repos`; the binding
@@ -22,6 +23,9 @@ communications**, Chad transmits or delegates the rest.
 This is a summary; the binding rules and full checklists live in governance (source of truth):
 - `~/repos/governance/policies/AGENT_INTERACTION_POLICY.md` — startup sequence + PHASE 0.5,
   and §"External Communication and Representation — Agents Do Not Transmit"
+- `~/repos/claude-config/skills/prepare-cad-drawing/SKILL.md` and
+  `~/repos/governance/contracts/CAD_EXPORT_FORMATS_CONTRACT.md` — engineering drawing and print
+  exports, including required project/batch/date/revision/source-SHA/input-digest traceability.
 - `~/repos/governance/standards/DOCUMENT_TEMPLATE_REGISTRY.md` — which template to use
 - `~/repos/governance/INDEX.md` — master registry of all contracts, policies, gates
 <!-- /GOVERNANCE-PREFLIGHT-v1 -->
