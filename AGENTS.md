@@ -6,9 +6,12 @@
 
 If you are Codex (or any agent that does not auto-load `CLAUDE.md`):
 - In lightweight mode, wait for the task, then read only the relevant repo instruction sections,
-  contracts, skills, and commands. Do not run a workspace audit solely because the session began.
+  contracts, skills, commands, and lessons before changing files. Startup alone does not require
+  a workspace audit, complete root-context read, synchronization, checklist, or PHASE 0.5
+  restatement. Mechanical gates and task-scoped context proof remain active.
 - `codex --full-context` restores the root audit, complete local instruction read, checklist, and
-  PHASE 0.5 restatement.
+  PHASE 0.5 restatement under the Agent Interaction Policy. Scale the execution steps and binding
+  constraints to the task; never force a fixed number of steps or policies.
 - **PHASE 0.25 context proof is task-scoped (protocol v1.1).** Run it *before
   content/entity-producing work* — any task in `governance/`, editing a Core doc, or
   producing/persisting customer/product/team/vendor-facing output (docs, quotes, decks,
